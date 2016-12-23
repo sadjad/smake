@@ -28,6 +28,7 @@ PKG_CHECK_MODULES([OpenSSL], [libssl libcrypto])
 
 # Check for Python
 AM_PATH_PYTHON(2.7)
+AM_CHECK_PYTHON_HEADERS(,[AC_MSG_ERROR(could not find Python headers)])
 
 AC_CONFIG_FILES([
 	Makefile
