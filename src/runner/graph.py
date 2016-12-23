@@ -45,7 +45,7 @@ def build_graph(data):
             if target_name and target_name != "Makefile":
                 started = True
                 lqueue = [target_name]
-                graph[target_name] = ['(root)'] # create the root
+                graph[target_name] = set([])
                 nodes[target_name] = Node(target_name)
 
             continue
@@ -56,24 +56,49 @@ def build_graph(data):
 
         if line_type == Makefile.Lines.TargetStart:
             if target_name not in graph:
-                graph[target_name] = []
+                graph[target_name] = set([])
                 nodes[target_name] = Node(target_name)
 
-            graph[target_name] += [lqueue[-1]]
+            graph[lqueue[-1]].add(target_name)
             lqueue.append(target_name)
         elif line_type == Makefile.Lines.TargetEnd:
             lqueue.pop()
         elif line_type == Makefile.Lines.PruningFile:
-            graph[target_name] += [lqueue[-1]]
+            graph[lqueue[-1]].add(target_name)
         elif line_type == Makefile.Lines.MustRemake:
             read_commands = (True, target_name)
 
     return (graph, nodes)
 
+def topological_sort(graph):
+    result = []
+    s = {k for k, v in graph.items() if len(v) == 0}
+
+    while len(s) > 0:
+        result += [list(s)]
+
+        new_s = set([])
+
+        for node in s:
+            for k, v in graph.items():
+                if node in v:
+                    v.remove(node)
+
+                    if len(v) == 0: new_s.add(k)
+
+        s = new_s
+
+    for _, v in graph.items():
+        if len(v) > 0:
+            raise Exception("graph has at least one cycle")
+
+    return result
+
 def main():
     graph, nodes = build_graph(sys.stdin)
     pprint.pprint(graph)
     pprint.pprint(nodes)
+    pprint.pprint(topological_sort(graph))
 
 if __name__ == '__main__':
     main()
