@@ -116,3 +116,5 @@ Makefile.in
 /stamp-h1
 /compile
 /test-driver
+
+.ftpconfig
