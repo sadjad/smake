@@ -29,8 +29,9 @@ def run(processes=1):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('--jobs', metavar='jobs', dest='jobs', type=int,
+    parser.add_argument('--jobs', '-j', metavar='jobs', dest='jobs', type=int,
+                        default=1,
                         help='Number of jobs that must be run simultaneously.')
 
     args = parser.parse_args()
-    run(processes=args.jobs or 1)
+    run(processes=args.jobs)
