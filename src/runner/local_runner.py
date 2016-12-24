@@ -6,20 +6,31 @@ import re
 import os
 import sys
 import pprint
+import argparse
+import multiprocessing as mp
+import subprocess as sub
+
+def run_command(command_list):
+    for command in command_list:
+        print(command, file=sys.stderr)
+        if sub.call(command, shell=True):
+            raise Exception("command failed: {}".format(command))
 
 import graph
 
-def main():
+def run(processes=1):
     g, nodes = graph.build_graph(sys.stdin)
     execution_order = graph.topological_sort(g)
 
+    pool = mp.Pool(processes=processes)
+
     for level in execution_order:
-        for item in level:
-            data = nodes[item]
-            for command in data.commands_list:
-                print("{}".format(command), file=sys.stderr)
-                if os.system(command):
-                    raise Exception("failed at: {}".format(item))
+        pool.map(run_command, [nodes[n].commands_list for n in level])
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument('--jobs', metavar='jobs', dest='jobs', type=int,
+                        help='Number of jobs that must be run simultaneously.')
+
+    args = parser.parse_args()
+    run(processes=args.jobs or 1)
