@@ -1,1 +1,1 @@
-SUBDIRS = util net http lambdareq launch pylaunch
+SUBDIRS = util net http lambdareq pylaunch
