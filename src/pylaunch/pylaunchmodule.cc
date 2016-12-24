@@ -25,20 +25,28 @@ PyMODINIT_FUNC initpylaunch(void) {
 // call launchpar from python
 static PyObject *pylaunch_launchpar(PyObject *self __attribute__((unused)), PyObject *args) {
     int nlaunch;
-    char *fn_name, *akid, *secret, *payload;
+    char *fn_name, *akid, *secret;
+    PyObject *payloads_obj;
     PyObject *lambda_regions_obj;
-    if (! PyArg_ParseTuple(args, "issssO!", &nlaunch, &fn_name, &akid, &secret, &payload, &PyList_Type, &lambda_regions_obj)) {
+    if (! PyArg_ParseTuple(args, "issssO!", &nlaunch, &fn_name, &akid, &secret, &PyList_Type, &payloads_obj, &PyList_Type, &lambda_regions_obj)) {
         return NULL;
     }
 
+    vector<string> payloads;
+    size_t npayloads = PyList_Size(payloads_obj);
+    for (size_t i = 0; i < npayloads; i++) {
+      PyObject *payload = PyList_GetItem(payloads_obj, i);
+      payloads.emplace_back(string(PyString_AsString(payload)));
+    }
+
     vector<string> lambda_regions;
-    int nregions = PyList_Size(lambda_regions_obj);
-    for (int i = 0; i < nregions; i++) {
+    size_t nregions = PyList_Size(lambda_regions_obj);
+    for (size_t i = 0; i < nregions; i++) {
         PyObject *region = PyList_GetItem(lambda_regions_obj, i);
         lambda_regions.emplace_back(string(PyString_AsString(region)));
     }
 
-    launchpar(nlaunch, string(fn_name), string(akid), string(secret), string(payload), lambda_regions);
+    launchpar(nlaunch, string(fn_name), string(akid), string(secret), payloads, lambda_regions);
 
     Py_RETURN_NONE;
 }

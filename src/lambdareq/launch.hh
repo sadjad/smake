@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-void launchpar(int nlaunch,
+void launchpar(size_t nlaunch,
                std::string fn_name,
                std::string akid,
                std::string secret,
-               std::string payload,
+               std::vector<std::string> payloads,
                std::vector<std::string> lambda_regions);

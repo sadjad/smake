@@ -1,4 +1,4 @@
-AM_CPPFLAGS = $(CXX14_FLAGS) -I$(srcdir)/../util -I$(srcdir)/../http
+AM_CPPFLAGS = $(CXX14_FLAGS) -I$(srcdir)/../util -I$(srcdir)/../net -I$(srcdir)/../http
 AM_CXXFLAGS = $(PICKY_CXXFLAGS)
 
 noinst_LTLIBRARIES = liblambdareq.la

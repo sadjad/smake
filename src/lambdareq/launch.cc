@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <stdexcept>
 #include <time.h>
 #include <unistd.h>
 
@@ -17,16 +18,19 @@ using namespace std;
 
 static SecureSocket new_connection(const Address &addr, const string &name, SSLContext &ctx);
 
-void launchpar(int nlaunch, string fn_name, string akid, string secret, string payload, vector<string> lambda_regions) {
+void launchpar(size_t nlaunch, string fn_name, string akid, string secret, vector<string> payloads, vector<string> lambda_regions) {
+    if (payloads.size() != nlaunch) {
+      throw runtime_error("payloads.size() != nlaunch");
+    }
     // prepare requests
     cerr << "Building requests... ";
 
     vector<vector<HTTPRequest>> request;
     for (unsigned j = 0; j < lambda_regions.size(); j++) {
         request.emplace_back(vector<HTTPRequest>());
-        for (int i = 0; i < nlaunch; i++) {
+        for (size_t i = 0; i < nlaunch; i++) {
             // replace ##ID## with launch number if it's in the string
-            string local_payload = payload;
+            string local_payload = payloads[i];
             int id_idx = local_payload.find("##ID##");
             if (id_idx >= 0) {
                 local_payload.replace(id_idx, 6, to_string(j*nlaunch + i));
@@ -46,7 +50,7 @@ void launchpar(int nlaunch, string fn_name, string akid, string secret, string p
         vector<string> servername;
         vector<Address> server;
         SSLContext ctx;
-        for (int i = 0; i < nlaunch; i++) {
+        for (size_t i = 0; i < nlaunch; i++) {
             for (unsigned j = 0; j < lambda_regions.size(); j++) {
                 if (i == 0) {
                     servername.emplace_back(string("lambda." + lambda_regions[j] + ".amazonaws.com"));
@@ -65,7 +69,7 @@ void launchpar(int nlaunch, string fn_name, string akid, string secret, string p
         for (int l = 0; ! all_done; l++) {
             bool found = false;
             for (unsigned j = 0; j < lambda_regions.size(); j++) {
-                for (int i = 0; i < nlaunch; i++) {
+                for (size_t i = 0; i < nlaunch; i++) {
                     if (! sfins[j][i]) {
                         int ret = 0;
                         www[j][i].getsockopt(SOL_SOCKET, SO_ERROR, ret);
@@ -101,7 +105,7 @@ void launchpar(int nlaunch, string fn_name, string akid, string secret, string p
         struct timespec start_time, stop_time;
         cerr << "Sending requests... ";
         clock_gettime(CLOCK_REALTIME, &start_time);
-        for (int i = 0; i < nlaunch; i++) {
+        for (size_t i = 0; i < nlaunch; i++) {
             for (unsigned j = 0; j < lambda_regions.size(); j++) {
                 www[j][i].set_blocking(true);
                 www[j][i].write(request[j][i].str());
@@ -114,7 +118,7 @@ void launchpar(int nlaunch, string fn_name, string akid, string secret, string p
 
     // parse responses
     HTTPResponseParser parser;
-    for (int i = 0; i < nlaunch; i++) {
+    for (size_t i = 0; i < nlaunch; i++) {
         for (unsigned j = 0; j < lambda_regions.size(); j++) {
             parser.new_request_arrived(request[j][i]);
 
