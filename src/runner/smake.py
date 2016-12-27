@@ -34,7 +34,8 @@ def get_callback_fn(graph):
         with condition:
             if status != 0:
                 print("failed: {} => {}".format(job_id, status), file=sys.stderr)
-                sys.exit(1)
+                thread.interrupt_main()
+                return
 
             running_queue.discard(job_id)
             remaining_targets.remove(job_id)
@@ -176,8 +177,8 @@ if __name__ == '__main__':
         'secret_key': args.aws_secret_key,
         'regions': [args.aws_region],
         'callback_url': 'http://{}/'.format(args.callback_server),
-        'fn_name': args.fn_name
+        'fn_name': args.fn_name,
+        'max_lambdas': args.jobs,
     }
 
-    pprint.pprint(configuration)
     main(sys.stdin, configuration)
