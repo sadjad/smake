@@ -131,7 +131,7 @@ def main(data, configuration):
         print("done.", file=sys.stderr)
 
         server_addr = "0.0.0.0"
-        server_port = 9090
+        server_port = 9092
 
         print("Starting callback server on {addr}:{port}...".format(addr=server_addr, port=server_port),
               file=sys.stderr, end='')
