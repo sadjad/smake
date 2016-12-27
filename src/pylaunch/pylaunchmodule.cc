@@ -28,7 +28,7 @@ static PyObject *pylaunch_launchpar(PyObject *self __attribute__((unused)), PyOb
     char *fn_name, *akid, *secret;
     PyObject *payloads_obj;
     PyObject *lambda_regions_obj;
-    if (! PyArg_ParseTuple(args, "issssO!", &nlaunch, &fn_name, &akid, &secret, &PyList_Type, &payloads_obj, &PyList_Type, &lambda_regions_obj)) {
+    if (! PyArg_ParseTuple(args, "isssO!O!", &nlaunch, &fn_name, &akid, &secret, &PyList_Type, &payloads_obj, &PyList_Type, &lambda_regions_obj)) {
         return NULL;
     }
 

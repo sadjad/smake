@@ -70,6 +70,18 @@ def build_graph(data):
 
     return (graph, nodes)
 
+def create_input_graph(graph_in):
+    graph_out = {}
+
+    for k, v in graph_in.items():
+        for node in v:
+            if node not in graph_out:
+                graph_out[node] = set([k])
+            else:
+                graph_out[node].add(k)
+
+    return graph_out
+
 def topological_sort(graph):
     result = []
     s = {k for k, v in graph.items() if len(v) == 0}

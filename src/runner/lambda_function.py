@@ -7,6 +7,7 @@ import os
 import boto3
 import subprocess as sub
 import requests
+import traceback
 
 s3_client = boto3.client('s3')
 
@@ -22,6 +23,8 @@ def preprocess(bucket, inputs):
 
     for f in inputs:
         s3_client.download_file(bucket, f, f)
+
+    print(os.listdir())
 
     return env_dir
 
@@ -42,13 +45,14 @@ def handler(event, context):
     outputs = event['outputs']
 
     try:
-        root_dir = preprocess(inputs)
+        root_dir = preprocess(bucket, inputs)
 
         for command in commands_list:
             run_command(command)
 
-        postprocess(root_dir, outputs)
+        postprocess(bucket, root_dir, outputs)
     except Exception as ex:
-        callback(callback_url, status=1)
+        callback(callback_url, job_id, 1)
+        traceback.print_exc()
     else:
-        callback(callback_url, status=0)
+        callback(callback_url, job_id, 0)

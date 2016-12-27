@@ -38,6 +38,7 @@ AC_CONFIG_FILES([
 	src/http/Makefile
 	src/lambdareq/Makefile
 	src/launch/Makefile
-	src/pylaunch/Makefile])
+	src/pylaunch/Makefile
+	src/runner/Makefile])
 
 AC_OUTPUT
