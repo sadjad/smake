@@ -1,0 +1,1 @@
+make -Bndr | python runner/smake.py --jobs=100 --callback-server 171.67.76.25:9092 --bucket sadjad-test --region us-west-2 --fn-name sadjad-xc-test
